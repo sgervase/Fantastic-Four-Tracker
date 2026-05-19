@@ -582,7 +582,8 @@ function renderDashboardCharts(bets) {
   const cCtx=document.getElementById('ch-cumul').getContext('2d');
   const isPos=(data[data.length-1]||0)>=0;
   charts.cumul=new Chart(cCtx,{type:'line',data:{labels,datasets:[{data,tension:.3,fill:false,
-    borderColor:isPos?'#1a472a':'#8b1c24',borderWidth:2,pointBackgroundColor:ptClrs,pointRadius:4,pointHoverRadius:6}]},
+    borderColor:isPos?'#1a472a':'#8b1c24',borderWidth:2,
+    pointRadius:0,pointHoverRadius:5,pointHoverBackgroundColor:isPos?'#1a472a':'#8b1c24'}]},
     options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
       plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1408',borderColor:'#c8a87a',borderWidth:1,
         titleColor:'#c8a87a',bodyColor:'#fdf8f0',callbacks:{label:ctx=>` ${ctx.raw>=0?'+':''}${ctx.raw.toFixed(3)} units`}}},
@@ -824,7 +825,8 @@ function openTeamModal(teamName) {
     const mCtx=document.getElementById('modal-chart').getContext('2d');
     const isPos=(data[data.length-1]||0)>=0;
     charts.modal=new Chart(mCtx,{type:'line',data:{labels,datasets:[{data,tension:.3,fill:false,
-      borderColor:isPos?'#1a472a':'#8b1c24',borderWidth:2,pointBackgroundColor:ptClrs,pointRadius:5,pointHoverRadius:7}]},
+      borderColor:isPos?'#1a472a':'#8b1c24',borderWidth:2,
+      pointRadius:0,pointHoverRadius:5,pointHoverBackgroundColor:isPos?'#1a472a':'#8b1c24'}]},
       options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
         plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1408',borderColor:'#c8a87a',borderWidth:1,
           titleColor:'#c8a87a',bodyColor:'#fdf8f0',callbacks:{label:ctx=>` ${ctx.raw>=0?'+':''}${ctx.raw.toFixed(3)} units`}}},
