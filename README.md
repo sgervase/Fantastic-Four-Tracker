@@ -1,139 +1,84 @@
-# ⚾ The Fantastic Four — MLB Betting Tracker
+# The Fantastic Four — MLB Betting Tracker
 
-A free, shareable betting dashboard that reads live from your Google Sheet.  
-No Tableau license. No login required. Anyone with the link can view it.
+A live MLB betting dashboard that reads directly from a Google Sheet and displays stats, charts, and team analysis.
 
----
+## Description
 
-## 🚀 Setup (10 minutes)
+The Fantastic Four is a single-file web dashboard built for tracking daily MLB bets. It pulls data from a published Google Sheet CSV on every page load, so the tracker updates automatically as bets are entered. The dashboard is organized into four pages: Dashboard (cumulative P/L and form), Analytics (rolling win rate and odds breakdown), Teams (per-team performance cards with a detail modal and live MLB hot/cold data), and History (filterable bet table). It is hosted free on GitHub Pages and requires no server, no login, and no paid software. 
 
-### Step 1 — Deploy to GitHub Pages
+## Getting Started
 
-1. Create a new GitHub repository (e.g. `fantastic-four-tracker`) — set it to **Public**
-2. Upload `index.html` to the root of the repo (**Add file → Upload files**)
-3. Go to **Settings → Pages → Source → Deploy from branch → `main` / `/(root)`**
-4. Click **Save** — your site will be live in ~2 minutes at:  
-   `https://YOUR_USERNAME.github.io/fantastic-four-tracker/`
+### Installing
 
-### Step 2 — Publish your Google Sheet as CSV
+* Download `index.html` from this repository
+* Create a new public GitHub repository
+* Upload `index.html` to the root of the repository
 
-1. Open the **MLB F4 2026** Google Sheet
-2. Go to **File → Share → Publish to web**
-3. First dropdown → select the **"MLB F4 2026"** tab (not "Entire document")
-4. Second dropdown → change **"Web page"** to **CSV**
-5. Click **Publish** → confirm → **copy the URL**
+### Executing program
 
-The URL will look like:
+* Enable GitHub Pages under Settings → Pages → Deploy from branch → main / (root)
+* Your site will be live at:
 ```
-https://docs.google.com/spreadsheets/d/SHEET_ID/pub?gid=123456789&single=true&output=csv
+https://YOUR_USERNAME.github.io/YOUR_REPO-NAME/
 ```
+* Publish your Google Sheet as a CSV:
+    * File → Share → Publish to web
+    * Select the MLB F4 2026 tab
+    * Change format from Web page to CSV
+    * Click Publish and copy the URL
+* Open the live site, click Setup in the top right, paste the CSV URL, and click Load Sheet
+* The browser saves the URL — anyone who visits the site will see live data on every load
 
-### Step 3 — Connect the sheet
+### Google Sheet Column Structure
 
-Open the live site → click **⚙ Setup** → paste the URL → click **Load Sheet**.
+The tracker reads columns B through N in this order:
 
-The browser saves it — anyone who visits sees live data on every page load.
+* B — Date (e.g. 5/12/2026)
+* C — Bet ID (sequential number)
+* D — Home Team
+* E — Away Team
+* F — Team Bet On (leave blank for totals and NRFI)
+* G — Player or F5 (enter "First 5 innings" for F5 bets, player name for props)
+* H — Over/Under direction (Over or Under)
+* I — Line (the number, e.g. 7.5 or -1.5 — leave blank for moneylines)
+* J — Market (Total, Side, Spread, or NRFI)
+* K — Units staked
+* L — Odds in American format (e.g. -110, +150)
+* M — Result (w, l, or p — leave blank for pending bets)
+* N — Gain/Loss in units (positive or negative)
 
-> **To update the dashboard file later:** go to the repo → Add file → Upload files → upload the new `index.html` — GitHub Pages redeploys automatically within a minute.
+## Help
 
----
+If the site loads but shows no data, confirm the Google Sheet is published as CSV (not Web page) and that the correct tab is selected before publishing.
 
-## 📋 Column Reference
+If charts appear blank when switching tabs, click the Refresh button in the header to force a reload.
 
-The tracker reads these columns from your sheet (positions B through N):
-
-| Col | Field | Notes |
-|-----|-------|-------|
-| B | Date | e.g. `5/12/2026` |
-| C | Bet ID | Sequential number |
-| D | Home Team | |
-| E | Away Team | |
-| F | Team Bet On | Leave blank for totals/NRFI |
-| G | Player or F5? | "First 5 innings" or player name for props |
-| H | Over/Under | "Over" or "Under" |
-| I | Line | Number (7.5, -1.5) — leave blank for moneylines |
-| J | Market | `Total`, `Side`, `Spread`, or `NRFI` |
-| K | Units | Stake in units (1.0, 0.5, etc.) |
-| L | Odds | American odds: -110, +150, etc. |
-| M | Result | `w`, `l`, or `p` — leave blank for pending |
-| N | Gain/Loss | Units won/lost (positive or negative) |
-
----
-
-## 📊 Dashboard Pages
-
-### Dashboard
-- Today's pending picks highlighted at the top (if any)
-- Cumulative units P/L line chart over every settled bet
-- Bet type W/L bar chart
-- Color-coded form strip grouped by day with hover tooltips
-
-### Analytics
-- **Rolling Win Rate** — sliding 5-bet window with a 50% break-even reference line
-- **Odds Bracket Performance** — W/L by bet price range (Heavy Fav → Big Dog), hover for ROI
-- **Bet Type Breakdown** — full W/L chart by bet category
-
-### Teams
-- **Your Team Tracker** — card for every team you've explicitly backed, showing W-L, win %, units P/L, and a mini form strip. Click any card to open a detail modal with that team's full P/L chart and bet history.
-- **MLB Hot & Cold** — live data from the free MLB Stats API (no key required), showing teams running 7-3 or better (hot) and 3-7 or worse (cold) in their last 10 games. Teams you've already bet on this season get an amber "On your radar" badge.
-
-### History
-- Full filterable bet history table — filter by bet type and result
-
----
-
-## 📈 Tracking Recommendations
-
-The sheet is solid — these tweaks would unlock deeper analysis:
-
-### 1. Split "Player or F5?" into two columns
-Currently this column holds both "First 5 innings" as a game modifier **and** player names for props. Split into:
-- **Game Segment**: `Full Game` / `F5`
-- **Player Name**: blank for game bets, fill in for props
-
-### 2. Add a Confidence column (1–3)
-Rate each pick before the game. After a full season, you can answer: *"Do my 3-star picks actually beat my 1-star picks?"* — the most valuable self-analysis a capper can do.
-
-### 3. Standardize units to simple tiers
-Stakes like `0.6666` and `0.7142` make ROI harder to read. Use clean tiers — **0.5u / 1u / 1.5u** — and use the Confidence column for weighting instead.
-
-### 4. Add a Sportsbook column
-Track where each bet was placed (DraftKings, FanDuel, BetMGM). Over a full season you'll see if you're consistently getting better prices at one book.
-
-### 5. Add a Closing Line column *(advanced)*
-Record the odds at game time next to the odds you got. Beating the closing line consistently is the strongest indicator of long-term edge — better than win percentage alone.
-
-### 6. Use `p` for pushes
-Enter `p` in the Result column for any push/refund. The dashboard already handles it, just needs the data.
-
----
-
-## 🔄 How live updates work
+If the MLB hot/cold section shows unavailable, the MLB Stats API may be temporarily down. The rest of the dashboard is unaffected.
 
 ```
-Frankie updates the Google Sheet
-        ↓
-Anyone opens the site URL
-        ↓
-Browser fetches the published CSV directly from Google
-        ↓
-Dashboard recalculates all stats and re-renders
-        ↓
-Everyone sees today's data — no server, no Python, no cost
+The site can always be reset to demo data by clearing the saved URL:
+localStorage.removeItem('f4_url') — run this in the browser console
 ```
 
----
+## Authors
 
-## 🛠 Tech Stack
+Built for Frankie Da Capper and the Fantastic Four.
 
-| Tool | Purpose |
-|------|---------|
-| HTML / CSS / JS | Single-file app, no build step |
-| [Chart.js](https://www.chartjs.org/) | All charts |
-| [PapaParse](https://www.papaparse.com/) | Google Sheets CSV parsing |
-| [MLB Stats API](https://statsapi.mlb.com) | Free, no key — hot/cold team data |
-| GitHub Pages | Free hosting, auto-deploys on push |
+## Version History
 
----
+* 1.0
+    * Four-tab layout: Dashboard, Analytics, Teams, History
+    * Live Google Sheets CSV integration
+    * Interactive team detail modal with per-team P/L chart
+    * MLB Stats API hot/cold team feed
 
-*The Fantastic Four · MLB 2026 · Frankie Da Capper · Est. in Good Faith*
+## License
+
+No license — personal project.
+
+## Acknowledgments
+
+* [Chart.js](https://www.chartjs.org/) — charts
+* [PapaParse](https://www.papaparse.com/) — CSV parsing
+* [MLB Stats API](https://statsapi.mlb.com) — free MLB standings and streak data
+* [GitHub Pages](https://pages.github.com/) — free static hosting
