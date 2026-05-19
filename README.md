@@ -1,5 +1,7 @@
 # The Fantastic Four — MLB Betting Tracker
 
+https://sgervase.github.io/Fantastic-Four-Tracker/
+
 A live MLB betting dashboard that reads directly from a Google Sheet and displays stats, charts, and team analysis.
 
 ## Description
