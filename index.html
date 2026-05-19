@@ -109,6 +109,8 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(-
 .team-card{background:var(--card);border:1px solid var(--border);padding:.85rem 1rem;cursor:pointer;transition:border-color .15s,box-shadow .15s}
 .team-card:hover{border-color:var(--tan);box-shadow:0 2px 8px rgba(26,20,8,.08)}
 .team-card.profit{border-left:3px solid var(--green)} .team-card.loss{border-left:3px solid var(--red)}
+.team-logo-wrap{height:36px;display:flex;align-items:center;margin-bottom:.45rem}
+.team-logo-wrap img{max-height:36px;max-width:64px;object-fit:contain}
 .team-name{font-family:'Oswald',sans-serif;font-weight:600;font-size:.95rem;letter-spacing:.02em;color:var(--ink);margin-bottom:.3rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .team-rec{font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--ink3);margin-bottom:.3rem}
 .team-pl{font-family:'Oswald',sans-serif;font-size:1.2rem;font-weight:700;line-height:1}
@@ -134,6 +136,14 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(-
 .mlb-l10{font-size:.68rem;color:var(--ink4);font-weight:500}
 .mlb-badge{font-size:.6rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--amber);background:rgba(184,134,11,.08);border:1px solid rgba(184,134,11,.25);padding:.1rem .35rem;display:inline-block;margin-top:.15rem}
 .mlb-loading{font-size:.82rem;color:var(--ink4);padding:.5rem 0}
+
+/* ── ROI TABLE ── */
+.roi-tbl{width:100%;border-collapse:collapse;font-size:.8rem;margin-top:.5rem}
+.roi-tbl th{text-align:left;font-size:.62rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink4);padding:.4rem .6rem;border-bottom:1px solid var(--border)}
+.roi-tbl td{padding:.45rem .6rem;border-bottom:1px solid var(--border)}
+.roi-tbl tr:last-child td{border-bottom:none}
+.roi-bar-wrap{width:80px;height:6px;background:var(--border);border-radius:3px;overflow:hidden;display:inline-block;vertical-align:middle;margin-right:.4rem}
+.roi-bar{height:100%;border-radius:3px}
 
 /* ── HISTORY TABLE ── */
 .hist-sec{background:var(--card);border:1px solid var(--border);overflow:hidden}
@@ -276,13 +286,20 @@ tbody td{padding:.6rem 1rem;vertical-align:middle;white-space:nowrap}
 
   <!-- ANALYTICS -->
   <div id="page-analytics" class="page">
-    <div class="sec-head">Momentum & Value</div>
+    <div class="sec-head">Trend</div>
+    <div class="cc mb"><div class="ch-sub">Weekly Win Rate — Rolling 7-Day Windows</div><div class="cw"><canvas id="ch-weekly"></canvas></div></div>
+
+    <div class="sec-head">Bet Type</div>
     <div class="two-eq">
-      <div class="cc"><div class="ch-sub">Rolling Win Rate — Last 5 Bets</div><div class="cw"><canvas id="ch-rolling"></canvas></div></div>
-      <div class="cc"><div class="ch-sub">Performance by Odds Range</div><div class="cw"><canvas id="ch-odds"></canvas></div></div>
+      <div class="cc"><div class="ch-sub">Game Segment — Full Game vs. F5</div><div class="cw"><canvas id="ch-segment"></canvas></div></div>
+      <div class="cc"><div class="ch-sub">ROI by Bet Type — Ranked</div><div id="roi-table" style="overflow-x:auto"></div></div>
     </div>
-    <div class="sec-head">Bet Breakdown</div>
-    <div class="cc mb"><div class="ch-sub">Win / Loss by Bet Type</div><div class="cw"><canvas id="ch-types2"></canvas></div></div>
+
+    <div class="sec-head">Context</div>
+    <div class="two-eq">
+      <div class="cc"><div class="ch-sub">Home vs. Away — Backing Each Side</div><div class="cw"><canvas id="ch-ha"></canvas></div></div>
+      <div class="cc"><div class="ch-sub">Day of Week Performance</div><div class="cw"><canvas id="ch-dow"></canvas></div></div>
+    </div>
   </div>
 
   <!-- TEAMS -->
@@ -293,16 +310,15 @@ tbody td{padding:.6rem 1rem;vertical-align:middle;white-space:nowrap}
     <div class="sec-head">MLB Hot &amp; Cold — Potential Targets</div>
     <div class="mlb-row">
       <div class="mlb-panel hot">
-        <div class="ch-sub" style="color:var(--green)">🔥 Hot Teams — Last 10 Games</div>
+        <div class="ch-sub" style="color:var(--green)">Hot Teams — Last 10 Games</div>
         <div class="mlb-cards" id="mlb-hot"><p class="mlb-loading">Loading MLB data…</p></div>
       </div>
       <div class="mlb-panel cold">
-        <div class="ch-sub" style="color:var(--red)">🧊 Cold Teams — Last 10 Games</div>
+        <div class="ch-sub" style="color:var(--red)">Cold Teams — Last 10 Games</div>
         <div class="mlb-cards" id="mlb-cold"><p class="mlb-loading">Loading MLB data…</p></div>
       </div>
     </div>
     <p style="font-size:.72rem;color:var(--ink4);margin-top:-.5rem;margin-bottom:1.25rem">
-      <span style="display:inline-block;width:10px;height:10px;border-left:3px solid var(--amber);margin-right:.3rem"></span>
       Amber border = you already have bets on this team this season
     </p>
   </div>
@@ -338,10 +354,13 @@ tbody td{padding:.6rem 1rem;vertical-align:middle;white-space:nowrap}
 <div id="team-modal" class="modal-overlay hidden" onclick="handleModalClick(event)">
   <div class="modal-box">
     <div class="modal-top">
-      <div>
-        <div class="modal-team-name" id="modal-name">—</div>
-        <div class="modal-stats" id="modal-stats">—</div>
-        <div class="modal-pl" id="modal-pl">—</div>
+      <div style="display:flex;align-items:center;gap:1rem">
+        <img id="modal-logo" src="" alt="" width="52" height="52" style="object-fit:contain;flex-shrink:0" onerror="this.style.display='none'">
+        <div>
+          <div class="modal-team-name" id="modal-name">—</div>
+          <div class="modal-stats" id="modal-stats">—</div>
+          <div class="modal-pl" id="modal-pl">—</div>
+        </div>
       </div>
       <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
@@ -444,8 +463,7 @@ function showPage(name) {
   requestAnimationFrame(() => {
     if (!allBets.length) return;
     if (name === 'dashboard')  { renderDashboardCharts(allBets); renderFormStrip(allBets); renderToday(allBets); }
-    if (name === 'analytics')  { renderAnalyticsCharts(allBets); }
-    if (name === 'teams')      { renderTeamTracker(allBets); if (!mlbLoaded) loadMLBData(); }
+    if (name === 'analytics')  { renderAnalyticsCharts(allBets); }    if (name === 'teams')      { renderTeamTracker(allBets); if (!mlbLoaded) loadMLBData(); }
     if (name === 'history')    { renderTable(); }
   });
 }
@@ -640,56 +658,184 @@ function renderToday(bets) {
 // ═════════════════════════════════════════════════════
 //  ANALYTICS
 // ═════════════════════════════════════════════════════
+const CHART_OPTS = {
+  bg:'#1a1408', border:'#e0d4bc', tc:'#a08060', bc:'#fdfaf5',
+  gridClr:'rgba(200,184,160,.2)', axClr:'#e0d4bc',
+};
+function baseTooltip(extra={}) {
+  return {backgroundColor:CHART_OPTS.bg,borderColor:CHART_OPTS.border,borderWidth:1,
+    titleColor:CHART_OPTS.tc,bodyColor:CHART_OPTS.bc,...extra};
+}
+function baseScales(yOpts={}) {
+  return {
+    x:{grid:{color:CHART_OPTS.gridClr},border:{color:CHART_OPTS.axClr},ticks:{color:'#a08060',font:{family:'IBM Plex Mono',size:10}}},
+    y:{grid:{color:CHART_OPTS.gridClr},border:{color:CHART_OPTS.axClr},ticks:{color:'#a08060',font:{family:'IBM Plex Mono',size:10}},...yOpts}
+  };
+}
+
 function renderAnalyticsCharts(bets) {
   const settled=bets.filter(b=>!b.pending&&(b.result==='w'||b.result==='l'));
+  renderWeeklyTrend(settled);
+  renderSegmentChart(settled);
+  renderROITable(settled);
+  renderHomeAway(settled);
+  renderDayOfWeek(settled);
+}
 
-  // Rolling win rate
-  const N=5;
-  if (settled.length>=N) {
-    const rl=[],rd=[],rp=[];
-    for(let i=N-1;i<settled.length;i++){
-      const w=settled.slice(i-N+1,i+1).filter(b=>b.result==='w').length;
-      const rate=parseFloat(((w/N)*100).toFixed(1));
-      rl.push(`#${settled[i].id}`);rd.push(rate);
-      rp.push(rate>=60?'#1a472a':rate>=40?'#a08050':'#8b1c24');
-    }
-    if(charts.rolling)charts.rolling.destroy();
-    const ctx=document.getElementById('ch-rolling').getContext('2d');
-    const refLine={id:'rl',beforeDraw(c){
-      const{ctx:cx,scales:{y},chartArea:{left,right}}=c;const yp=y.getPixelForValue(50);
-      cx.save();cx.setLineDash([4,4]);cx.strokeStyle='rgba(160,128,80,.5)';cx.lineWidth=1;
-      cx.beginPath();cx.moveTo(left,yp);cx.lineTo(right,yp);cx.stroke();cx.setLineDash([]);
-      cx.fillStyle='#a08060';cx.font='9px IBM Plex Mono';cx.fillText('50%',right+4,yp+3);cx.restore();
-    }};
-    charts.rolling=new Chart(ctx,{type:'line',plugins:[refLine],data:{labels:rl,datasets:[{data:rd,tension:.4,fill:false,borderColor:'#8b1c24',borderWidth:2,pointBackgroundColor:rp,pointRadius:5,pointHoverRadius:7}]},
-      options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
-        plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1408',borderColor:'#c8a87a',borderWidth:1,titleColor:'#c8a87a',bodyColor:'#fdf8f0',callbacks:{label:ctx=>` ${ctx.raw}% (last ${N} bets)`}}},
-        scales:{x:{grid:{color:'rgba(200,168,122,.25)'},border:{color:'#c8a87a'},ticks:{color:'#a08060',maxTicksLimit:10,font:{family:'IBM Plex Mono',size:10}}},
-          y:{min:0,max:100,grid:{color:'rgba(200,168,122,.25)'},border:{color:'#c8a87a'},ticks:{color:'#a08060',font:{family:'IBM Plex Mono',size:10},callback:v=>v+'%'}}}}});
-  }
+// 1. Weekly win rate trend
+function renderWeeklyTrend(settled) {
+  if(!settled.length) return;
+  const weeks={};
+  settled.forEach(b=>{
+    const d=new Date(b.date);
+    // Get Monday of that week as key
+    const day=d.getDay();
+    const mon=new Date(d);mon.setDate(d.getDate()-(day===0?6:day-1));
+    const key=mon.toISOString().slice(0,10);
+    if(!weeks[key])weeks[key]={w:0,l:0,label:`Wk of ${mon.toLocaleDateString('en-US',{month:'short',day:'numeric'})}`};
+    weeks[key][b.result]++;
+  });
+  const wks=Object.entries(weeks).sort((a,b)=>a[0].localeCompare(b[0]));
+  const labels=wks.map(([,v])=>v.label);
+  const rates=wks.map(([,v])=>{const t=v.w+v.l;return t?parseFloat(((v.w/t)*100).toFixed(1)):0;});
+  const ptClrs=rates.map(r=>r>=60?'#1a472a':r>=40?'#a08050':'#8b1c24');
 
-  // Odds brackets
-  const brackets=[
-    {label:'Heavy Fav',test:o=>o<=-151},
-    {label:'Favorite', test:o=>o>=-150&&o<=-111},
-    {label:"Pick'em",  test:o=>o>=-110&&o<=110},
-    {label:'Underdog', test:o=>o>=111&&o<=175},
-    {label:'Big Dog',  test:o=>o>=176},
-  ].map(b=>({...b,w:0,l:0,pl:0,units:0}));
-  settled.forEach(b=>{const br=brackets.find(br=>br.test(b.odds));if(!br)return;br[b.result]++;br.pl+=b.gainLoss||0;br.units+=b.units;});
-  const active=brackets.filter(b=>b.w+b.l>0);
-  if(charts.odds)charts.odds.destroy();
-  const oCtx=document.getElementById('ch-odds').getContext('2d');
-  charts.odds=buildBarChart(oCtx,active.map(b=>b.label),active.map(b=>b.w),active.map(b=>b.l),
-    items=>{const b=active[items[0].dataIndex];const tot=b.w+b.l;const pct=tot>0?Math.round(b.w/tot*100):0;const roi=b.units>0?((b.pl/b.units)*100).toFixed(1):'0.0';return[`Win rate: ${pct}%`,`P/L: ${b.pl>=0?'+':''}${b.pl.toFixed(2)}u`,`ROI: ${roi}%`];});
+  if(charts.weekly)charts.weekly.destroy();
+  const ctx=document.getElementById('ch-weekly').getContext('2d');
+  const refLine={id:'rl',beforeDraw(c){
+    const{ctx:cx,scales:{y},chartArea:{left,right}}=c;const yp=y.getPixelForValue(50);
+    cx.save();cx.setLineDash([4,4]);cx.strokeStyle='rgba(160,128,80,.45)';cx.lineWidth=1;
+    cx.beginPath();cx.moveTo(left,yp);cx.lineTo(right,yp);cx.stroke();
+    cx.setLineDash([]);cx.fillStyle='#a08060';cx.font='9px IBM Plex Mono';cx.fillText('50%',right+4,yp+3);cx.restore();
+  }};
+  charts.weekly=new Chart(ctx,{type:'line',plugins:[refLine],
+    data:{labels,datasets:[{data:rates,tension:.35,fill:false,borderColor:'#8b1c24',borderWidth:2,
+      pointBackgroundColor:ptClrs,pointRadius:5,pointHoverRadius:7}]},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:false},tooltip:{...baseTooltip(),callbacks:{
+        label:ctx=>{const w=wks[ctx.dataIndex][1];return ` ${ctx.raw}% (${w.w}W-${w.l}L)`;}
+      }}},
+      scales:{...baseScales({min:0,max:100,ticks:{color:'#a08060',font:{family:'IBM Plex Mono',size:10},callback:v=>v+'%'}})}
+    }});
+}
 
-  // Bet type (duplicate for analytics page)
+// 2. Game segment — full game vs F5
+function renderSegmentChart(settled) {
+  const seg={Full:{w:0,l:0,pl:0,units:0},F5:{w:0,l:0,pl:0,units:0}};
+  settled.forEach(b=>{
+    const pf5=(b.playerF5||'').toLowerCase();
+    const isF5=pf5.includes('first')||pf5==='f5'||pf5.includes('innings');
+    const s=isF5?'F5':'Full';
+    seg[s][b.result]++;seg[s].pl+=b.gainLoss||0;seg[s].units+=b.units;
+  });
+  if(charts.segment)charts.segment.destroy();
+  const ctx=document.getElementById('ch-segment').getContext('2d');
+  charts.segment=new Chart(ctx,{type:'bar',
+    data:{labels:['Full Game','First 5 (F5)'],datasets:[
+      {label:'Wins',  data:[seg.Full.w,seg.F5.w],backgroundColor:'rgba(26,71,42,.65)', borderColor:'#1a472a',borderWidth:1,borderRadius:2},
+      {label:'Losses',data:[seg.Full.l,seg.F5.l],backgroundColor:'rgba(139,28,36,.65)',borderColor:'#8b1c24',borderWidth:1,borderRadius:2},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:'#7a5c3a',font:{family:'DM Sans',size:12},boxWidth:12,padding:10}},
+        tooltip:{...baseTooltip(),callbacks:{afterBody(items){
+          const s=items[0].dataIndex===0?seg.Full:seg.F5;
+          const tot=s.w+s.l;const pct=tot?Math.round(s.w/tot*100):0;
+          const roi=s.units?((s.pl/s.units)*100).toFixed(1):'0.0';
+          return[`Win rate: ${pct}%`,`P/L: ${s.pl>=0?'+':''}${s.pl.toFixed(2)}u`,`ROI: ${roi}%`];
+        }}}},
+      scales:{x:{grid:{display:false},border:{color:CHART_OPTS.axClr},ticks:{color:'#7a5c3a',font:{family:'DM Sans',size:11}}},
+        y:{grid:{color:CHART_OPTS.gridClr},border:{color:CHART_OPTS.axClr},ticks:{color:'#a08060',stepSize:1,font:{family:'IBM Plex Mono',size:10}}}}}});
+}
+
+// 3. ROI ranked table
+function renderROITable(settled) {
   const typeMap={};
-  settled.forEach(b=>{const t=getBetType(b);if(!typeMap[t])typeMap[t]={w:0,l:0};typeMap[t][b.result]++;});
-  const types=Object.keys(typeMap);
-  if(charts.types2)charts.types2.destroy();
-  const t2Ctx=document.getElementById('ch-types2').getContext('2d');
-  charts.types2=buildBarChart(t2Ctx,types,types.map(t=>typeMap[t].w),types.map(t=>typeMap[t].l));
+  settled.forEach(b=>{
+    const t=getBetType(b);
+    if(!typeMap[t])typeMap[t]={w:0,l:0,pl:0,units:0};
+    typeMap[t][b.result]++;typeMap[t].pl+=b.gainLoss||0;typeMap[t].units+=b.units;
+  });
+  const rows=Object.entries(typeMap).map(([type,s])=>{
+    const tot=s.w+s.l;
+    return{type,w:s.w,l:s.l,pct:tot?Math.round(s.w/tot*100):0,
+      pl:s.pl,roi:s.units?parseFloat(((s.pl/s.units)*100).toFixed(1)):0};
+  }).sort((a,b)=>b.roi-a.roi);
+
+  const maxAbs=Math.max(...rows.map(r=>Math.abs(r.roi)),1);
+  const el=document.getElementById('roi-table');
+  el.innerHTML=`<table class="roi-tbl">
+    <thead><tr><th>Type</th><th>W-L</th><th>Win%</th><th>ROI</th></tr></thead>
+    <tbody>${rows.map(r=>{
+      const roiClr=r.roi>0?'#1a472a':r.roi<0?'#8b1c24':'#a08060';
+      const barW=Math.round((Math.abs(r.roi)/maxAbs)*80);
+      const barClr=r.roi>0?'rgba(26,71,42,.65)':'rgba(139,28,36,.65)';
+      return `<tr>
+        <td style="font-weight:600;font-size:.78rem">${r.type}</td>
+        <td style="font-family:'IBM Plex Mono',monospace;font-size:.75rem">${r.w}-${r.l}</td>
+        <td style="font-family:'IBM Plex Mono',monospace;font-size:.75rem">${r.pct}%</td>
+        <td>
+          <span class="roi-bar-wrap"><span class="roi-bar" style="width:${barW}px;background:${barClr}"></span></span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:.75rem;color:${roiClr}">${r.roi>=0?'+':''}${r.roi}%</span>
+        </td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table>`;
+}
+
+// 4. Home vs Away
+function renderHomeAway(settled) {
+  // Bets where a specific team was backed
+  const sided=settled.filter(b=>b.teamBet&&(b.market==='Side'||b.market==='Spread'));
+  const ha={Home:{w:0,l:0,pl:0,units:0},Away:{w:0,l:0,pl:0,units:0}};
+  sided.forEach(b=>{
+    const side=b.teamBet===b.home?'Home':'Away';
+    ha[side][b.result]++;ha[side].pl+=b.gainLoss||0;ha[side].units+=b.units;
+  });
+  if(charts.ha)charts.ha.destroy();
+  const ctx=document.getElementById('ch-ha').getContext('2d');
+  charts.ha=new Chart(ctx,{type:'bar',
+    data:{labels:['Home','Away'],datasets:[
+      {label:'Wins',  data:[ha.Home.w,ha.Away.w],backgroundColor:'rgba(26,71,42,.65)', borderColor:'#1a472a',borderWidth:1,borderRadius:2},
+      {label:'Losses',data:[ha.Home.l,ha.Away.l],backgroundColor:'rgba(139,28,36,.65)',borderColor:'#8b1c24',borderWidth:1,borderRadius:2},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:'#7a5c3a',font:{family:'DM Sans',size:12},boxWidth:12,padding:10}},
+        tooltip:{...baseTooltip(),callbacks:{afterBody(items){
+          const s=items[0].dataIndex===0?ha.Home:ha.Away;
+          const tot=s.w+s.l;const pct=tot?Math.round(s.w/tot*100):0;
+          const roi=s.units?((s.pl/s.units)*100).toFixed(1):'0.0';
+          return[`Win rate: ${pct}%`,`P/L: ${s.pl>=0?'+':''}${s.pl.toFixed(2)}u`,`ROI: ${roi}%`];
+        }}}},
+      scales:{x:{grid:{display:false},border:{color:CHART_OPTS.axClr},ticks:{color:'#7a5c3a',font:{family:'DM Sans',size:11}}},
+        y:{grid:{color:CHART_OPTS.gridClr},border:{color:CHART_OPTS.axClr},ticks:{color:'#a08060',stepSize:1,font:{family:'IBM Plex Mono',size:10}}}}}});
+}
+
+// 5. Day of week
+function renderDayOfWeek(settled) {
+  const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const dow=days.map(d=>({label:d,w:0,l:0,pl:0,units:0}));
+  settled.forEach(b=>{
+    const d=new Date(b.date).getDay();
+    dow[d][b.result]++;dow[d].pl+=b.gainLoss||0;dow[d].units+=b.units;
+  });
+  const active=dow.filter(d=>d.w+d.l>0);
+  if(charts.dow)charts.dow.destroy();
+  const ctx=document.getElementById('ch-dow').getContext('2d');
+  charts.dow=new Chart(ctx,{type:'bar',
+    data:{labels:active.map(d=>d.label),datasets:[
+      {label:'Wins',  data:active.map(d=>d.w),backgroundColor:'rgba(26,71,42,.65)', borderColor:'#1a472a',borderWidth:1,borderRadius:2},
+      {label:'Losses',data:active.map(d=>d.l),backgroundColor:'rgba(139,28,36,.65)',borderColor:'#8b1c24',borderWidth:1,borderRadius:2},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:'#7a5c3a',font:{family:'DM Sans',size:12},boxWidth:12,padding:10}},
+        tooltip:{...baseTooltip(),callbacks:{afterBody(items){
+          const d=active[items[0].dataIndex];const tot=d.w+d.l;
+          const pct=tot?Math.round(d.w/tot*100):0;
+          const roi=d.units?((d.pl/d.units)*100).toFixed(1):'0.0';
+          return[`Win rate: ${pct}%`,`P/L: ${d.pl>=0?'+':''}${d.pl.toFixed(2)}u`,`ROI: ${roi}%`];
+        }}}},
+      scales:{x:{grid:{display:false},border:{color:CHART_OPTS.axClr},ticks:{color:'#7a5c3a',font:{family:'DM Sans',size:11}}},
+        y:{grid:{color:CHART_OPTS.gridClr},border:{color:CHART_OPTS.axClr},ticks:{color:'#a08060',stepSize:1,font:{family:'IBM Plex Mono',size:10}}}}}});
 }
 
 function buildBarChart(ctx,labels,wData,lData,afterBodyFn) {
@@ -698,10 +844,25 @@ function buildBarChart(ctx,labels,wData,lData,afterBodyFn) {
     {label:'Losses',data:lData,backgroundColor:'rgba(139,28,36,.65)',borderColor:'#8b1c24',borderWidth:1,borderRadius:2},
   ]},options:{responsive:true,maintainAspectRatio:false,
     plugins:{legend:{labels:{color:'#7a5c3a',font:{family:'DM Sans',size:12},boxWidth:12,padding:10}},
-      tooltip:{backgroundColor:'#1a1408',borderColor:'#c8a87a',borderWidth:1,titleColor:'#c8a87a',bodyColor:'#fdf8f0',
-        callbacks:afterBodyFn?{afterBody:afterBodyFn}:{}}},
-    scales:{x:{grid:{display:false},border:{color:'#c8a87a'},ticks:{color:'#7a5c3a',font:{family:'DM Sans',size:11}}},
-      y:{grid:{color:'rgba(200,168,122,.25)'},border:{color:'#c8a87a'},ticks:{color:'#a08060',stepSize:1,font:{family:'IBM Plex Mono',size:10}}}}}});
+      tooltip:{...baseTooltip(),callbacks:afterBodyFn?{afterBody:afterBodyFn}:{}}},
+    scales:{x:{grid:{display:false},border:{color:CHART_OPTS.axClr},ticks:{color:'#7a5c3a',font:{family:'DM Sans',size:11}}},
+      y:{grid:{color:CHART_OPTS.gridClr},border:{color:CHART_OPTS.axClr},ticks:{color:'#a08060',stepSize:1,font:{family:'IBM Plex Mono',size:10}}}}}});
+}
+
+// ═════════════════════════════════════════════════════
+//  TEAM LOGO MAP  (ESPN CDN — img tags, no CORS issues)
+// ═════════════════════════════════════════════════════
+const LOGO_MAP = {
+  'Angels':'laa','Astros':'hou','Athletics':'oak','Blue Jays':'tor','Braves':'atl',
+  'Brewers':'mil','Cardinals':'stl','Cubs':'chc','Diamondbacks':'ari','Dodgers':'lad',
+  'Giants':'sf','Guardians':'cle','Mariners':'sea','Marlins':'mia','Mets':'nym',
+  'Nationals':'wsh','Orioles':'bal','Padres':'sd','Phillies':'phi','Pirates':'pit',
+  'Rangers':'tex','Rays':'tb','Red Sox':'bos','Reds':'cin','Rockies':'col',
+  'Royals':'kc','Tigers':'det','Twins':'min','White Sox':'cws','Yankees':'nyy',
+};
+function logoUrl(teamName) {
+  const abbr = LOGO_MAP[teamName];
+  return abbr ? `https://a.espncdn.com/i/teamlogos/mlb/500/${abbr}.png` : '';
 }
 
 // ═════════════════════════════════════════════════════
@@ -727,7 +888,10 @@ function renderTeamTracker(bets) {
     const winPct=settled>0?Math.round(s.w/settled*100):null;
     const dots=s.history.slice(-6).map(r=>`<span class="tf ${r}">${r.toUpperCase()}</span>`).join('');
     const pend=s.pending>0?`<span style="color:var(--tan-d)"> +${s.pending} live</span>`:'';
+    const logo=logoUrl(name);
+    const logoHtml=logo?`<div class="team-logo-wrap"><img src="${logo}" alt="${name} logo" onerror="this.parentElement.style.display='none'"></div>`:'';
     return `<div class="team-card ${cardCls}" onclick="openTeamModal('${name}')">
+      ${logoHtml}
       <div class="team-name">${name}</div>
       <div class="team-rec">${s.w}-${s.l}${winPct!==null?` · ${winPct}%`:''}</div>
       <div class="team-pl ${plCls}">${plStr}</div>
@@ -815,6 +979,10 @@ function openTeamModal(teamName) {
   const plEl=document.getElementById('modal-pl');
   plEl.textContent=`${totalPL>=0?'+':''}${totalPL.toFixed(3)} units`;
   plEl.className=`modal-pl ${totalPL>=0?'pos':'neg'}`;
+  const logoEl=document.getElementById('modal-logo');
+  const url=logoUrl(teamName);
+  if(url){logoEl.src=url;logoEl.style.display='block';}
+  else{logoEl.style.display='none';}
 
   // Mini P/L chart for this team
   let cum=0;
