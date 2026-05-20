@@ -512,17 +512,29 @@ function loadData(url) {
 // ── Date parser: strips time component, always returns local time ──
 function parseLocalDate(str) {
   if (!str) return new Date(NaN);
-  // Strip any time portion e.g. "5/13/2026 0:00:00" -> "5/13/2026"
-  var clean = String(str).trim().split(' ')[0];
-  var parts = clean.split('/');
-  if (parts.length === 3) {
-    return new Date(Number(parts[2]), Number(parts[0]) - 1, Number(parts[1]));
+  var s = String(str).trim();
+  // Strip any time portion ("5/19/2026 0:00:00" or "2026-05-19T00:00:00Z")
+  s = s.split('T')[0].split(' ')[0];
+
+  var slash = s.split('/');
+  if (slash.length === 3) {
+    var m = Number(slash[0]), d = Number(slash[1]), y = Number(slash[2]);
+    if (y < 100) y += 2000; // handle 2-digit year ("5/19/26")
+    return new Date(y, m - 1, d);
   }
-  var iso = clean.split('-');
-  if (iso.length === 3) {
-    return new Date(Number(iso[0]), Number(iso[1]) - 1, Number(iso[2]));
+  if (slash.length === 2) {
+    // "M/D" with no year — use current calendar year
+    var m = Number(slash[0]), d = Number(slash[1]);
+    return new Date(new Date().getFullYear(), m - 1, d);
   }
-  return new Date(str);
+
+  var dash = s.split('-');
+  if (dash.length === 3) {
+    var y = Number(dash[0]), m = Number(dash[1]), d = Number(dash[2]);
+    return new Date(y, m - 1, d);
+  }
+
+  return new Date(NaN);
 }
 
 function parseDemoRow(row) {
