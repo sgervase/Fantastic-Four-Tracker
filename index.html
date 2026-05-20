@@ -615,7 +615,7 @@ function renderDashboardCharts(bets) {
   const labels=[],data=[],ptClrs=[];
   settled.forEach(b=>{
     cum+=b.gainLoss||0;
-    labels.push(`#${b.id}`);
+    labels.push(fmtDate(b.date));
     data.push(parseFloat(cum.toFixed(4)));
     ptClrs.push(b.result==='w'?'#1a472a':b.result==='l'?'#8b1c24':'#a08060');
   });
@@ -628,7 +628,7 @@ function renderDashboardCharts(bets) {
     options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
       plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1408',borderColor:'#c8a87a',borderWidth:1,
         titleColor:'#c8a87a',bodyColor:'#fdf8f0',callbacks:{label:ctx=>` ${ctx.raw>=0?'+':''}${ctx.raw.toFixed(3)} units`}}},
-      scales:{x:{grid:{color:'rgba(200,184,160,.2)'},border:{color:'#e0d4bc'},ticks:{color:'#a08060',maxTicksLimit:10,font:{family:'IBM Plex Mono',size:10}}},
+      scales:{x:{grid:{color:'rgba(200,184,160,.2)'},border:{color:'#e0d4bc'},ticks:{color:'#a08060',font:{family:'IBM Plex Mono',size:10}}
         y:{grid:{color:'rgba(200,184,160,.2)'},border:{color:'#e0d4bc'},ticks:{color:'#a08060',font:{family:'IBM Plex Mono',size:10},callback:v=>(v>=0?'+':'')+v.toFixed(1)+'u'}}}}});
 
   const typeMap={};
