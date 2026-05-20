@@ -487,8 +487,26 @@ function loadData(url) {
   });
 }
 
+// Safe local-time date parser — avoids UTC-shift bugs with M/D/YYYY strings
+function parseLocalDate(str) {
+  if (!str) return new Date(NaN);
+  // Handle M/D/YYYY or MM/DD/YYYY
+  const parts = String(str).trim().split('/');
+  if (parts.length === 3) {
+    const [m, d, y] = parts.map(Number);
+    return new Date(y, m - 1, d);  // always local time, no UTC shift
+  }
+  // Fallback for ISO strings like 2026-05-13
+  const iso = str.split('T')[0].split('-');
+  if (iso.length === 3) {
+    const [y, m, d] = iso.map(Number);
+    return new Date(y, m - 1, d);
+  }
+  return new Date(str);
+}
+
 function parseDemoRow([ds,id,home,away,teamBet,pf5,ouDir,line,market,units,odds,result,gainLoss]) {
-  return {id,date:new Date(ds),home,away,teamBet,playerF5:pf5,ouDir,line:String(line),market,units,odds,
+  return {id,date:parseLocalDate(ds),home,away,teamBet,playerF5:pf5,ouDir,line:String(line),market,units,odds,
           result:(result||'').toLowerCase(),gainLoss,pending:!result};
 }
 
@@ -498,7 +516,7 @@ function parseSheetRows(rows) {
     if (row.length<12) continue;
     const id=parseFloat(row[2]);
     if (!Number.isFinite(id)||id<=0||id>9999) continue;
-    const date=new Date(row[1]);
+    const date=parseLocalDate(row[1]);
     if (isNaN(date)) continue;
     const result=(row[12]||'').trim().toLowerCase();
     const glRaw=(row[13]||'').trim();
