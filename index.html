@@ -676,15 +676,15 @@ function renderNarrative(bets) {
   var seasonText = 'Through <strong>' + total + ' settled bets</strong>, the Fantastic Four is <strong>' + stats.wins + '-' + stats.losses + '</strong> on the season (' + wpStr + ') with <strong>' + plStr + '</strong> in units and <strong>' + roiStr + ' ROI</strong>. ';
 
   if (stats.totalPL > 0) {
-    seasonText += 'The Four is comfortably in the green. Every unit risked this season has returned a positive yield. ';
+    seasonText += "The Four is comfortably in the green. Let's keep this up. ";
   } else if (stats.totalPL < 0) {
-    seasonText += 'The Four is currently underwater — the focus should be on tightening the selection criteria and waiting for the right spots. ';
+    seasonText += 'The Four is currently underwater. Time to chin up and right this ship.';
   }
 
   if (stats.streak >= 3 && stats.streakType === 'w') {
     seasonText += 'They are riding a hot <strong>' + stats.streak + '-bet winning streak</strong> heading into the next card.';
   } else if (stats.streak >= 3 && stats.streakType === 'l') {
-    seasonText += 'A <strong>' + stats.streak + '-bet losing streak</strong> is the current concern. Variance or a genuine cold spell, its worth watching.';
+    seasonText += 'A <strong>' + stats.streak + '-bet losing streak</strong> is the current concern, but we know Frankie will turn it around. #Variance';
   } else if (stats.streak > 0) {
     seasonText += 'Current streak: <strong>' + (stats.streakType === 'w' ? 'W' : 'L') + stats.streak + '</strong>.';
   }
