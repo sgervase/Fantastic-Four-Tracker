@@ -684,7 +684,7 @@ function renderNarrative(bets) {
   if (stats.streak >= 3 && stats.streakType === 'w') {
     seasonText += 'They are riding a hot <strong>' + stats.streak + '-bet winning streak</strong> heading into the next card.';
   } else if (stats.streak >= 3 && stats.streakType === 'l') {
-    seasonText += 'A <strong>' + stats.streak + '-bet losing streak</strong> is the current concern, but we know Frankie will turn it around. #Variance';
+    seasonText += 'A <strong>' + stats.streak + '-bet losing streak</strong> is the current concern, but we know Frankie will turn it around #Variance';
   } else if (stats.streak > 0) {
     seasonText += 'Current streak: <strong>' + (stats.streakType === 'w' ? 'W' : 'L') + stats.streak + '</strong>.';
   }
