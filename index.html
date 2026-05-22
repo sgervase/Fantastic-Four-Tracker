@@ -673,18 +673,18 @@ function renderNarrative(bets) {
   var wpStr   = (stats.winPct * 100).toFixed(1) + '%';
 
   // Season sentence
-  var seasonText = 'Through <strong>' + total + ' settled bets</strong>, the Fantastic Four are <strong>' + stats.wins + '-' + stats.losses + '</strong> on the season (' + wpStr + ') with <strong>' + plStr + '</strong> in units and <strong>' + roiStr + ' ROI</strong>. ';
+  var seasonText = 'Through <strong>' + total + ' settled bets</strong>, the Fantastic Four is <strong>' + stats.wins + '-' + stats.losses + '</strong> on the season (' + wpStr + ') with <strong>' + plStr + '</strong> in units and <strong>' + roiStr + ' ROI</strong>. ';
 
   if (stats.totalPL > 0) {
-    seasonText += 'The Four are comfortably in the green — every unit risked this season has returned a positive yield. ';
+    seasonText += 'The Four is comfortably in the green. Every unit risked this season has returned a positive yield. ';
   } else if (stats.totalPL < 0) {
-    seasonText += 'The Four are currently underwater — the focus should be on tightening the selection criteria and waiting for the right spots. ';
+    seasonText += 'The Four is currently underwater — the focus should be on tightening the selection criteria and waiting for the right spots. ';
   }
 
   if (stats.streak >= 3 && stats.streakType === 'w') {
     seasonText += 'They are riding a hot <strong>' + stats.streak + '-bet winning streak</strong> heading into the next card.';
   } else if (stats.streak >= 3 && stats.streakType === 'l') {
-    seasonText += 'A <strong>' + stats.streak + '-bet losing streak</strong> is the current concern — variance or a genuine cold spell, worth watching.';
+    seasonText += 'A <strong>' + stats.streak + '-bet losing streak</strong> is the current concern. Variance or a genuine cold spell, it'''s worth watching.';
   } else if (stats.streak > 0) {
     seasonText += 'Current streak: <strong>' + (stats.streakType === 'w' ? 'W' : 'L') + stats.streak + '</strong>.';
   }
