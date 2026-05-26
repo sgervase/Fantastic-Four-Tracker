@@ -255,11 +255,11 @@ tbody td{padding:.6rem 1rem;vertical-align:middle;white-space:nowrap}
 
 <!-- ── STATS BAR ── -->
 <div class="stats-bar">
-  <div class="sb"><div class="sl">Record</div><div class="sv" id="s-rec">—</div></div>
-  <div class="sb"><div class="sl">Win %</div><div class="sv" id="s-wp">—</div></div>
+  <div class="sb"><div class="sl">Daily Record</div><div class="sv" id="s-drec">—</div><div class="ss" id="s-brec"></div></div>
+  <div class="sb"><div class="sl">Daily Win %</div><div class="sv" id="s-dwp">—</div><div class="ss" id="s-bwp"></div></div>
+  <div class="sb"><div class="sl">Daily Streak</div><div class="sv" id="s-str">—</div></div>
   <div class="sb"><div class="sl">Units P/L</div><div class="sv" id="s-ul">—</div><div class="ss" id="s-dl"></div></div>
   <div class="sb"><div class="sl">ROI</div><div class="sv" id="s-roi">—</div></div>
-  <div class="sb"><div class="sl">Streak</div><div class="sv" id="s-str">—</div></div>
   <div class="sb"><div class="sl">Avg Odds</div><div class="sv" id="s-odd">—</div></div>
 </div>
 
@@ -608,6 +608,20 @@ function sameDay(a, b) {
 // ═════════════════════════════════════════════════════
 //  STATS
 // ═════════════════════════════════════════════════════
+
+// Build a day-keyed map of net P/L for every settled day
+function buildDayMap(bets) {
+  var dayMap   = {};
+  var dayOrder = [];
+  var settled  = bets.filter(function(b) { return !b.pending && b.result; });
+  settled.forEach(function(b) {
+    var key = b.date.toDateString();
+    if (!dayMap[key]) { dayMap[key] = { date: b.date, pl: 0 }; dayOrder.push(key); }
+    dayMap[key].pl += b.gainLoss || 0;
+  });
+  return { dayMap: dayMap, dayOrder: dayOrder };
+}
+
 function calcStats(bets) {
   var settled  = bets.filter(function(b) { return !b.pending && b.result; });
   var wins     = settled.filter(function(b) { return b.result === 'w'; }).length;
@@ -618,16 +632,39 @@ function calcStats(bets) {
   var roi      = totalBet > 0 ? (totalPL / totalBet) * 100 : 0;
   var winPct   = (wins + losses) > 0 ? wins / (wins + losses) : 0;
   var avgOdds  = settled.length > 0 ? settled.reduce(function(s, b) { return s + b.odds; }, 0) / settled.length : 0;
-  var streak = 0, streakType = '';
-  for (var i = settled.length - 1; i >= 0; i--) {
-    var r = settled[i].result;
+
+  // Daily record — a day is a W if net units > 0, L if < 0, push if exactly 0
+  var dm = buildDayMap(bets);
+  var dWins = 0, dLosses = 0, dPushes = 0;
+  dm.dayOrder.forEach(function(key) {
+    var pl = dm.dayMap[key].pl;
+    if (pl > 0) dWins++;
+    else if (pl < 0) dLosses++;
+    else dPushes++;
+  });
+  var dWinPct = (dWins + dLosses) > 0 ? dWins / (dWins + dLosses) : 0;
+
+  // Daily streak — walk days in reverse
+  var dStreak = 0, dStreakType = '';
+  for (var i = dm.dayOrder.length - 1; i >= 0; i--) {
+    var pl = dm.dayMap[dm.dayOrder[i]].pl;
+    var r  = pl > 0 ? 'w' : pl < 0 ? 'l' : 'p';
     if (r === 'p') continue;
-    if (!streakType) streakType = r;
-    if (r === streakType) streak++;
+    if (!dStreakType) dStreakType = r;
+    if (r === dStreakType) dStreak++;
     else break;
   }
-  return {wins:wins, losses:losses, pushes:pushes, totalBet:totalBet, totalPL:totalPL,
-          roi:roi, winPct:winPct, avgOdds:avgOdds, streak:streak, streakType:streakType, settled:settled};
+
+  return {
+    // bet-level
+    wins:wins, losses:losses, pushes:pushes,
+    totalBet:totalBet, totalPL:totalPL, roi:roi, winPct:winPct, avgOdds:avgOdds,
+    settled:settled,
+    // day-level
+    dWins:dWins, dLosses:dLosses, dPushes:dPushes,
+    dWinPct:dWinPct, dStreak:dStreak, dStreakType:dStreakType,
+    totalDays: dm.dayOrder.length
+  };
 }
 
 // ═════════════════════════════════════════════════════
@@ -646,16 +683,31 @@ function renderStatsBar(s) {
     el.textContent = val;
     el.className = 'sv' + (cls ? ' ' + cls : '');
   }
-  set('s-rec', s.wins + '-' + s.losses + (s.pushes > 0 ? '-' + s.pushes : ''));
-  set('s-wp',  s.winPct > 0 ? (s.winPct * 100).toFixed(1) + '%' : '—',
-      s.winPct >= 0.55 ? 'pos' : (s.winPct < 0.5 && s.wins + s.losses > 0 ? 'neg' : ''));
-  set('s-ul',  (s.totalPL >= 0 ? '+' : '') + s.totalPL.toFixed(2) + 'u', s.totalPL >= 0 ? 'pos' : 'neg');
+
+  // Daily record — headline
+  var dRec = s.dWins + '-' + s.dLosses + (s.dPushes > 0 ? '-' + s.dPushes : '');
+  set('s-drec', dRec, s.dWins > s.dLosses ? 'pos' : s.dLosses > s.dWins ? 'neg' : '');
+  var bRecEl = document.getElementById('s-brec');
+  bRecEl.textContent = s.wins + '-' + s.losses + ' bets';
+
+  // Daily win %
+  var dWpStr = s.dWinPct > 0 ? (s.dWinPct * 100).toFixed(1) + '%' : '—';
+  set('s-dwp', dWpStr, s.dWinPct >= 0.55 ? 'pos' : (s.dWinPct < 0.5 && s.dWins + s.dLosses > 0 ? 'neg' : ''));
+  var bWpEl = document.getElementById('s-bwp');
+  bWpEl.textContent = s.winPct > 0 ? (s.winPct * 100).toFixed(1) + '% bets' : '';
+
+  // Daily streak
+  var strTxt = s.dStreak > 0 ? (s.dStreakType === 'w' ? 'W' : 'L') + s.dStreak : '—';
+  set('s-str', strTxt, s.dStreakType === 'w' ? 'pos' : s.dStreakType === 'l' ? 'neg' : '');
+
+  // Units P/L
+  set('s-ul', (s.totalPL >= 0 ? '+' : '') + s.totalPL.toFixed(2) + 'u', s.totalPL >= 0 ? 'pos' : 'neg');
   var dl = document.getElementById('s-dl'), dollars = s.totalPL * UNIT_VALUE;
   dl.textContent = (dollars >= 0 ? '+' : '-') + '$' + Math.abs(dollars).toFixed(0);
   dl.style.color = dollars >= 0 ? 'var(--green)' : 'var(--red)';
+
+  // ROI + Avg Odds
   set('s-roi', (s.roi >= 0 ? '+' : '') + s.roi.toFixed(1) + '%', s.roi >= 0 ? 'pos' : 'neg');
-  var strTxt = s.streak > 0 ? (s.streakType === 'w' ? 'W' : 'L') + s.streak : '—';
-  set('s-str', strTxt, s.streakType === 'w' ? 'pos' : s.streakType === 'l' ? 'neg' : '');
   set('s-odd', s.avgOdds ? fmtOdds(Math.round(s.avgOdds)) : '—');
 }
 
@@ -667,26 +719,28 @@ function renderNarrative(bets) {
   var settled = stats.settled;
   if (!settled.length) return;
 
-  var total   = stats.wins + stats.losses;
-  var plStr   = (stats.totalPL >= 0 ? '+' : '') + stats.totalPL.toFixed(2) + 'u';
-  var roiStr  = (stats.roi >= 0 ? '+' : '') + stats.roi.toFixed(1) + '%';
-  var wpStr   = (stats.winPct * 100).toFixed(1) + '%';
+  var plStr  = (stats.totalPL >= 0 ? '+' : '') + stats.totalPL.toFixed(2) + 'u';
+  var roiStr = (stats.roi >= 0 ? '+' : '') + stats.roi.toFixed(1) + '%';
+  var dWpStr = (stats.dWinPct * 100).toFixed(1) + '%';
 
-  // Season sentence
-  var seasonText = 'Through <strong>' + total + ' settled bets</strong>, the Fantastic Four is <strong>' + stats.wins + '-' + stats.losses + '</strong> on the season (' + wpStr + ') with <strong>' + plStr + '</strong> in units and <strong>' + roiStr + ' ROI</strong>. ';
+  // Season sentence — lead with daily record
+  var seasonText = 'Through <strong>' + stats.totalDays + ' days</strong>, the Fantastic Four are <strong>' +
+    stats.dWins + '-' + stats.dLosses + '</strong> (' + dWpStr + ' profitable days) with <strong>' +
+    plStr + '</strong> in units and <strong>' + roiStr + ' ROI</strong>. ';
 
   if (stats.totalPL > 0) {
-    seasonText += "The Four is comfortably in the green. Let's keep this up. ";
+    seasonText += "The Four are comfortably in the green. Let's keep it going. ";
   } else if (stats.totalPL < 0) {
-    seasonText += 'The Four is currently underwater. Time to chin up and right this ship.';
+    seasonText += 'The Four are currently underwater. Time to chin up and right the ship. ';
   }
 
-  if (stats.streak >= 3 && stats.streakType === 'w') {
-    seasonText += 'They are riding a hot <strong>' + stats.streak + '-bet winning streak</strong> heading into the next card.';
-  } else if (stats.streak >= 3 && stats.streakType === 'l') {
-    seasonText += 'A <strong>' + stats.streak + '-bet losing streak</strong> is the current concern, but we know Frankie will turn it around #Variance';
-  } else if (stats.streak > 0) {
-    seasonText += 'Current streak: <strong>' + (stats.streakType === 'w' ? 'W' : 'L') + stats.streak + '</strong>.';
+  // Daily streak in narrative
+  if (stats.dStreak >= 3 && stats.dStreakType === 'w') {
+    seasonText += 'They are riding <strong>' + stats.dStreak + ' straight profitable days</strong> heading into the next card.';
+  } else if (stats.dStreak >= 3 && stats.dStreakType === 'l') {
+    seasonText += '<strong>' + stats.dStreak + ' straight losing days</strong> is the current concern — but we know Frankie will turn it around.';
+  } else if (stats.dStreak > 0) {
+    seasonText += 'Current run: <strong>' + (stats.dStreakType === 'w' ? 'W' : 'L') + stats.dStreak + '</strong> day' + (stats.dStreak > 1 ? 's' : '') + '.';
   }
 
   // Best bet type by ROI
@@ -710,27 +764,39 @@ function renderNarrative(bets) {
     seasonText += ' <strong>' + bestType + '</strong> bets have been the sharpest angle at ' + (bestROI >= 0 ? '+' : '') + bestROI.toFixed(1) + '% ROI.';
   }
 
-  // Recent 7 days
-  var cutoff   = new Date();
+  // Recent 7 days — use daily record for this window too
+  var cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - 7);
-  var recent   = settled.filter(function(b) { return b.date >= cutoff; });
-  var recentW  = recent.filter(function(b) { return b.result === 'w'; }).length;
-  var recentL  = recent.filter(function(b) { return b.result === 'l'; }).length;
-  var recentPL = recent.reduce(function(s, b) { return s + (b.gainLoss || 0); }, 0);
-  var recentWP = (recentW + recentL) > 0 ? Math.round(recentW / (recentW + recentL) * 100) : 0;
+
+  var recentDayMap = {}, recentDayOrder = [];
+  settled.forEach(function(b) {
+    if (b.date < cutoff) return;
+    var key = b.date.toDateString();
+    if (!recentDayMap[key]) { recentDayMap[key] = { pl: 0 }; recentDayOrder.push(key); }
+    recentDayMap[key].pl += b.gainLoss || 0;
+  });
+
+  var rDW = 0, rDL = 0, rPL = 0;
+  recentDayOrder.forEach(function(k) {
+    var pl = recentDayMap[k].pl;
+    rPL += pl;
+    if (pl > 0) rDW++;
+    else if (pl < 0) rDL++;
+  });
 
   var recentText = '';
-  if (recent.length > 0) {
-    var plSign = recentPL >= 0 ? '+' : '';
-    recentText = 'Over the last 7 days, the Four went <strong>' + recentW + '-' + recentL + '</strong> (' + recentWP + '%) for <strong>' + plSign + recentPL.toFixed(2) + ' units</strong>. ';
-
-    var seasonWP = stats.winPct > 0 ? stats.winPct * 100 : 0;
-    if (recentWP > seasonWP + 10) {
-      recentText += 'The recent run is well above the season average — the picks are in a hot stretch.';
-    } else if (recentWP < seasonWP - 10) {
-      recentText += 'The recent stretch has cooled off relative to the season average — patience and selectivity are key.';
+  if (recentDayOrder.length > 0) {
+    var plSign = rPL >= 0 ? '+' : '';
+    recentText = 'Over the last 7 days, the Four went <strong>' + rDW + '-' + rDL + '</strong> on the daily card for <strong>' +
+      plSign + rPL.toFixed(2) + ' units</strong>. ';
+    var seasonDWP = stats.dWinPct * 100;
+    var recentDWP = (rDW + rDL) > 0 ? (rDW / (rDW + rDL)) * 100 : 0;
+    if (recentDWP > seasonDWP + 15) {
+      recentText += 'The recent stretch is well above the season pace — the card is running hot.';
+    } else if (recentDWP < seasonDWP - 15) {
+      recentText += 'The recent stretch has cooled off relative to the season pace — patience and selectivity are key.';
     } else {
-      recentText += 'Form is tracking roughly in line with the season average.';
+      recentText += 'Recent form is tracking in line with the season average.';
     }
   } else {
     recentText = 'No settled bets in the last 7 days.';
