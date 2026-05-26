@@ -8,29 +8,6 @@ A live MLB betting dashboard that reads directly from a Google Sheet and display
 
 The Fantastic Four is a single-file web dashboard built for tracking daily MLB bets. It pulls data from a published Google Sheet CSV on every page load, so the tracker updates automatically as bets are entered. The dashboard is organized into four pages: Dashboard (cumulative P/L and form), Analytics (rolling win rate and odds breakdown), Teams (per-team performance cards with a detail modal and live MLB hot/cold data), and History (filterable bet table). It is hosted free on GitHub Pages and requires no server, no login, and no paid software. 
 
-## Getting Started
-
-### Installing
-
-* Download `index.html` from this repository
-* Create a new public GitHub repository
-* Upload `index.html` to the root of the repository
-
-### Executing program
-
-* Enable GitHub Pages under Settings → Pages → Deploy from branch → main / (root)
-* Your site will be live at:
-```
-https://YOUR_USERNAME.github.io/YOUR_REPO-NAME/
-```
-* Publish your Google Sheet as a CSV:
-    * File → Share → Publish to web
-    * Select the MLB F4 2026 tab
-    * Change format from Web page to CSV
-    * Click Publish and copy the URL
-* Open the live site, click Setup in the top right, paste the CSV URL, and click Load Sheet
-* The browser saves the URL — anyone who visits the site will see live data on every load
-
 ### Google Sheet Column Structure
 
 The tracker reads columns B through N in this order:
