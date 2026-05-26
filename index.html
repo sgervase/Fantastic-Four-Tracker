@@ -631,7 +631,20 @@ function calcStats(bets) {
   var totalPL  = settled.reduce(function(s, b) { return s + (b.gainLoss || 0); }, 0);
   var roi      = totalBet > 0 ? (totalPL / totalBet) * 100 : 0;
   var winPct   = (wins + losses) > 0 ? wins / (wins + losses) : 0;
-  var avgOdds  = settled.length > 0 ? settled.reduce(function(s, b) { return s + b.odds; }, 0) / settled.length : 0;
+  // Convert each bet's American odds to decimal, average, convert back
+  function americanToDecimal(o) {
+    return o >= 100 ? (o / 100) + 1 : (100 / Math.abs(o)) + 1;
+  }
+  function decimalToAmerican(d) {
+    if (d >= 2) return Math.round((d - 1) * 100);
+    return Math.round(-100 / (d - 1));
+  }
+  var avgOdds = 0, avgOddsAmerican = null;
+  if (settled.length > 0) {
+    var sumDecimal = settled.reduce(function(s, b) { return s + americanToDecimal(b.odds); }, 0);
+    var avgDecimal = sumDecimal / settled.length;
+    avgOddsAmerican = decimalToAmerican(avgDecimal);
+  }
 
   // Daily record — a day is a W if net units > 0, L if < 0, push if exactly 0
   var dm = buildDayMap(bets);
@@ -658,7 +671,7 @@ function calcStats(bets) {
   return {
     // bet-level
     wins:wins, losses:losses, pushes:pushes,
-    totalBet:totalBet, totalPL:totalPL, roi:roi, winPct:winPct, avgOdds:avgOdds,
+    totalBet:totalBet, totalPL:totalPL, roi:roi, winPct:winPct, avgOddsAmerican:avgOddsAmerican,
     settled:settled,
     // day-level
     dWins:dWins, dLosses:dLosses, dPushes:dPushes,
@@ -708,7 +721,7 @@ function renderStatsBar(s) {
 
   // ROI + Avg Odds
   set('s-roi', (s.roi >= 0 ? '+' : '') + s.roi.toFixed(1) + '%', s.roi >= 0 ? 'pos' : 'neg');
-  set('s-odd', s.avgOdds ? fmtOdds(Math.round(s.avgOdds)) : '—');
+  set('s-odd', s.avgOddsAmerican !== null ? fmtOdds(s.avgOddsAmerican) : '—');
 }
 
 // ═════════════════════════════════════════════════════
