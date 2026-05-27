@@ -288,7 +288,7 @@ tbody td{padding:.6rem 1rem;vertical-align:middle;white-space:nowrap}
           <p class="narrative-p" id="narrative-season">Loading…</p>
         </div>
         <div class="narrative-section">
-          <div class="narrative-label">Recent Form — Last 7 Days</div>
+          <div class="narrative-label">Recent Activity — Last 7 Days</div>
           <p class="narrative-p" id="narrative-recent">Loading…</p>
         </div>
       </div>
@@ -300,7 +300,7 @@ tbody td{padding:.6rem 1rem;vertical-align:middle;white-space:nowrap}
       <div class="cc"><div class="ch-sub">Bet Type Breakdown</div><div class="cw"><canvas id="ch-types"></canvas></div></div>
     </div>
 
-    <div class="sec-head">Recent Form — All Settled Bets</div>
+    <div class="sec-head">Recent Activity — All Settled Bets</div>
     <div class="form-wrap">
       <div class="form-strip" id="form-strip"><span style="color:var(--ink4);font-size:.82rem">Loading…</span></div>
     </div>
@@ -737,23 +737,23 @@ function renderNarrative(bets) {
   var dWpStr = (stats.dWinPct * 100).toFixed(1) + '%';
 
   // Season sentence — lead with daily record
-  var seasonText = 'Through <strong>' + stats.totalDays + ' days</strong>, the Fantastic Four are <strong>' +
+  var seasonText = 'Through <strong>' + stats.totalDays + ' days</strong>, the Fantastic Four is <strong>' +
     stats.dWins + '-' + stats.dLosses + '</strong> (' + dWpStr + ' profitable days) with <strong>' +
-    plStr + '</strong> in units and <strong>' + roiStr + ' ROI</strong>. ';
+    plStr + '</strong> net units and <strong>' + roiStr + ' ROI</strong>. ';
 
   if (stats.totalPL > 0) {
-    seasonText += "The Four are comfortably in the green. Let's keep it going. ";
+    seasonText += "The Fantastic 4 is in the green. Let's keep it going. ";
   } else if (stats.totalPL < 0) {
-    seasonText += 'The Four are currently underwater. Time to chin up and right the ship. ';
+    seasonText += 'The Fantastic 4 is currently underwater. Time to chin up and right the ship. ';
   }
 
   // Daily streak in narrative
   if (stats.dStreak >= 3 && stats.dStreakType === 'w') {
     seasonText += 'They are riding <strong>' + stats.dStreak + ' straight profitable days</strong> heading into the next card.';
   } else if (stats.dStreak >= 3 && stats.dStreakType === 'l') {
-    seasonText += '<strong>' + stats.dStreak + ' straight losing days</strong> is the current concern — but we know Frankie will turn it around.';
+    seasonText += '<strong>' + stats.dStreak + ' straight losing days</strong> is the current concern, but we know Frankie will turn it around.';
   } else if (stats.dStreak > 0) {
-    seasonText += 'Current run: <strong>' + (stats.dStreakType === 'w' ? 'W' : 'L') + stats.dStreak + '</strong> day' + (stats.dStreak > 1 ? 's' : '') + '.';
+    seasonText += 'Current run: <strong>' + (stats.dStreakType === 'w' ? 'W' : 'L') + stats.dStreak + '</strong>' + (stats.dStreak > 1 ? 's' : '') + '.';
   }
 
   // Best bet type by ROI
@@ -800,16 +800,16 @@ function renderNarrative(bets) {
   var recentText = '';
   if (recentDayOrder.length > 0) {
     var plSign = rPL >= 0 ? '+' : '';
-    recentText = 'Over the last 7 days, the Four went <strong>' + rDW + '-' + rDL + '</strong> on the daily card for <strong>' +
+    recentText = 'Over the last 7 days, the F4 went <strong>' + rDW + '-' + rDL + '</strong> on the daily card for <strong>' +
       plSign + rPL.toFixed(2) + ' units</strong>. ';
     var seasonDWP = stats.dWinPct * 100;
     var recentDWP = (rDW + rDL) > 0 ? (rDW / (rDW + rDL)) * 100 : 0;
     if (recentDWP > seasonDWP + 15) {
-      recentText += 'The recent stretch is well above the season pace — the card is running hot.';
+      recentText += 'The recent stretch is well above the season pace. The card is running hot.';
     } else if (recentDWP < seasonDWP - 15) {
-      recentText += 'The recent stretch has cooled off relative to the season pace — patience and selectivity are key.';
+      recentText += 'The recent stretch has cooled off relative to the season pace.';
     } else {
-      recentText += 'Recent form is tracking in line with the season average.';
+      recentText += 'Recent performance is tracking in line with the season average.';
     }
   } else {
     recentText = 'No settled bets in the last 7 days.';
