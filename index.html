@@ -742,9 +742,9 @@ function renderNarrative(bets) {
     plStr + '</strong> net units and <strong>' + roiStr + ' ROI</strong>. ';
 
   if (stats.totalPL > 0) {
-    seasonText += "The Fantastic 4 is in the green. Let's keep it going. ";
+    seasonText += "The Fantastic Four is in the green. Let's keep it going. ";
   } else if (stats.totalPL < 0) {
-    seasonText += 'The Fantastic 4 is currently underwater. Time to chin up and right the ship. ';
+    seasonText += 'The Fantastic Four is currently underwater. Time to chin up and right the ship. ';
   }
 
   // Daily streak in narrative
@@ -800,7 +800,7 @@ function renderNarrative(bets) {
   var recentText = '';
   if (recentDayOrder.length > 0) {
     var plSign = rPL >= 0 ? '+' : '';
-    recentText = 'Over the last 7 days, the F4 went <strong>' + rDW + '-' + rDL + '</strong> on the daily card for <strong>' +
+    recentText = 'Over the last 7 days, the Fantastic Four went <strong>' + rDW + '-' + rDL + '</strong> on the daily card for <strong>' +
       plSign + rPL.toFixed(2) + ' units</strong>. ';
     var seasonDWP = stats.dWinPct * 100;
     var recentDWP = (rDW + rDL) > 0 ? (rDW / (rDW + rDL)) * 100 : 0;
