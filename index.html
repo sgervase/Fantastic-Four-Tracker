@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Fantastic Four — MLB Betting Tracker</title>
+<title>The Fantastic Four - MLB Betting Tracker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -232,7 +232,7 @@ tbody td{padding:.6rem 1rem;vertical-align:middle;white-space:nowrap}
       <div class="masthead-sub"> </div>
     </div>
     <div class="masthead-meta">
-      <div id="ts">—</div>
+      <div id="ts">-</div>
     </div>
   </div>
 </div>
@@ -240,7 +240,7 @@ tbody td{padding:.6rem 1rem;vertical-align:middle;white-space:nowrap}
 <!-- ── SETUP ── -->
 <div id="setup-banner" class="setup hidden">
   <h3>Connect Your Google Sheet</h3>
-  <p>Paste your published CSV URL below — the page will remember it.</p>
+  <p>Paste your published CSV URL below - the page will remember it.</p>
   <div class="url-row">
     <input type="text" id="sheet-url" placeholder="https://docs.google.com/spreadsheets/d/YOUR_ID/pub?output=csv&gid=0"/>
     <button class="btn" style="width:auto" onclick="loadFromInput()">Load Sheet</button>
@@ -250,17 +250,17 @@ tbody td{padding:.6rem 1rem;vertical-align:middle;white-space:nowrap}
 
 <!-- ── DEMO BAR ── -->
 <div id="demo-bar" class="demo-bar">
-  Showing demo data — click ⚙ Setup to connect your live Google Sheet.
+  Showing demo data - click ⚙ Setup to connect your live Google Sheet.
 </div>
 
 <!-- ── STATS BAR ── -->
 <div class="stats-bar">
-  <div class="sb"><div class="sl">Daily Record</div><div class="sv" id="s-drec">—</div><div class="ss" id="s-brec"></div></div>
-  <div class="sb"><div class="sl">Daily Win %</div><div class="sv" id="s-dwp">—</div><div class="ss" id="s-bwp"></div></div>
-  <div class="sb"><div class="sl">Daily Streak</div><div class="sv" id="s-str">—</div></div>
-  <div class="sb"><div class="sl">Units P/L</div><div class="sv" id="s-ul">—</div><div class="ss" id="s-dl"></div></div>
-  <div class="sb"><div class="sl">ROI</div><div class="sv" id="s-roi">—</div></div>
-  <div class="sb"><div class="sl">Avg Odds</div><div class="sv" id="s-odd">—</div></div>
+  <div class="sb"><div class="sl">Daily Record</div><div class="sv" id="s-drec">-</div><div class="ss" id="s-brec"></div></div>
+  <div class="sb"><div class="sl">Daily Win %</div><div class="sv" id="s-dwp">-</div><div class="ss" id="s-bwp"></div></div>
+  <div class="sb"><div class="sl">Daily Streak</div><div class="sv" id="s-str">-</div></div>
+  <div class="sb"><div class="sl">Units P/L</div><div class="sv" id="s-ul">-</div><div class="ss" id="s-dl"></div></div>
+  <div class="sb"><div class="sl">ROI</div><div class="sv" id="s-roi">-</div></div>
+  <div class="sb"><div class="sl">Avg Odds</div><div class="sv" id="s-odd">-</div></div>
 </div>
 
 <!-- ── NAV TABS ── -->
@@ -300,7 +300,7 @@ tbody td{padding:.6rem 1rem;vertical-align:middle;white-space:nowrap}
       <div class="cc"><div class="ch-sub">Bet Type Breakdown</div><div class="cw"><canvas id="ch-types"></canvas></div></div>
     </div>
 
-    <div class="sec-head">Recent Activity — All Settled Bets</div>
+    <div class="sec-head">Recent Activity - All Settled Bets</div>
     <div class="form-wrap">
       <div class="form-strip" id="form-strip"><span style="color:var(--ink4);font-size:.82rem">Loading…</span></div>
     </div>
@@ -312,28 +312,28 @@ tbody td{padding:.6rem 1rem;vertical-align:middle;white-space:nowrap}
     <div class="cc mb"><div class="ch-sub">Weekly Win Rate</div><div class="cw"><canvas id="ch-weekly"></canvas></div></div>
     <div class="sec-head">Bet Type</div>
     <div class="two-eq">
-      <div class="cc"><div class="ch-sub">Game Segment — Full Game vs. F5</div><div class="cw"><canvas id="ch-segment"></canvas></div></div>
-      <div class="cc"><div class="ch-sub">ROI by Bet Type — Ranked</div><div id="roi-table" style="overflow-x:auto"></div></div>
+      <div class="cc"><div class="ch-sub">Game Segment - Full Game vs. F5</div><div class="cw"><canvas id="ch-segment"></canvas></div></div>
+      <div class="cc"><div class="ch-sub">ROI by Bet Type - Ranked</div><div id="roi-table" style="overflow-x:auto"></div></div>
     </div>
     <div class="sec-head">Context</div>
     <div class="two-eq">
-      <div class="cc"><div class="ch-sub">Home vs. Away — Backing Each Side</div><div class="cw"><canvas id="ch-ha"></canvas></div></div>
+      <div class="cc"><div class="ch-sub">Home vs. Away - Backing Each Side</div><div class="cw"><canvas id="ch-ha"></canvas></div></div>
       <div class="cc"><div class="ch-sub">Day of Week Performance</div><div class="cw"><canvas id="ch-dow"></canvas></div></div>
     </div>
   </div>
 
   <!-- TEAMS -->
   <div id="page-teams" class="page">
-    <div class="sec-head">Frankie's Bets by Team — Click Any Card for Details</div>
+    <div class="sec-head">Frankie's Bets by Team - Click Any Card for Details</div>
     <div class="team-grid" id="team-grid"><p style="color:var(--ink4);font-size:.82rem">Loading…</p></div>
-    <div class="sec-head">MLB Hot &amp; Cold — Potential Targets</div>
+    <div class="sec-head">MLB Hot &amp; Cold - Potential Targets</div>
     <div class="mlb-row">
       <div class="mlb-panel hot">
-        <div class="ch-sub" style="color:var(--green)">Hot Teams — Last 10 Games</div>
+        <div class="ch-sub" style="color:var(--green)">Hot Teams - Last 10 Games</div>
         <div class="mlb-cards" id="mlb-hot"><p class="mlb-loading">Loading MLB data…</p></div>
       </div>
       <div class="mlb-panel cold">
-        <div class="ch-sub" style="color:var(--red)">Cold Teams — Last 10 Games</div>
+        <div class="ch-sub" style="color:var(--red)">Cold Teams - Last 10 Games</div>
         <div class="mlb-cards" id="mlb-cold"><p class="mlb-loading">Loading MLB data…</p></div>
       </div>
     </div>
@@ -376,9 +376,9 @@ tbody td{padding:.6rem 1rem;vertical-align:middle;white-space:nowrap}
       <div style="display:flex;align-items:center;gap:1rem">
         <img id="modal-logo" src="" alt="" width="52" height="52" style="object-fit:contain;flex-shrink:0" onerror="this.style.display='none'">
         <div>
-          <div class="modal-team-name" id="modal-name">—</div>
-          <div class="modal-stats" id="modal-stats">—</div>
-          <div class="modal-pl" id="modal-pl">—</div>
+          <div class="modal-team-name" id="modal-name">-</div>
+          <div class="modal-stats" id="modal-stats">-</div>
+          <div class="modal-pl" id="modal-pl">-</div>
         </div>
       </div>
       <button class="modal-close" onclick="closeModal()">✕</button>
@@ -505,7 +505,7 @@ function loadData(url) {
       var t = new Date();
       document.getElementById('ts').textContent = 'Updated ' + t.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
     },
-    error: function() { document.getElementById('ts').textContent = 'Load error — check URL'; }
+    error: function() { document.getElementById('ts').textContent = 'Load error - check URL'; }
   });
 }
 
@@ -523,7 +523,7 @@ function parseLocalDate(str) {
     return new Date(y, m - 1, d);
   }
   if (slash.length === 2) {
-    // "M/D" with no year — use current calendar year
+    // "M/D" with no year - use current calendar year
     var m = Number(slash[0]), d = Number(slash[1]);
     return new Date(new Date().getFullYear(), m - 1, d);
   }
@@ -591,14 +591,14 @@ function getBetDesc(b) {
   var pf5  = (b.playerF5 || '').toLowerCase();
   var isF5 = pf5.indexOf('first') >= 0 || pf5.indexOf('innings') >= 0 || pf5 === 'f5';
   var f5   = isF5 ? ' (F5)' : '';
-  if (b.market === 'NRFI')   return 'NRFI ' + b.ouDir + ' ' + b.line + ' — ' + b.home + '/' + b.away;
-  if (b.market === 'Total')  return b.ouDir + ' ' + b.line + f5 + ' — ' + b.home + '/' + b.away;
+  if (b.market === 'NRFI')   return 'NRFI ' + b.ouDir + ' ' + b.line + ' - ' + b.home + '/' + b.away;
+  if (b.market === 'Total')  return b.ouDir + ' ' + b.line + f5 + ' - ' + b.home + '/' + b.away;
   if (b.market === 'Side')   return b.teamBet + ' ML' + f5;
   if (b.market === 'Spread') return b.teamBet + ' ' + b.line + f5;
   return b.home + ' vs. ' + b.away;
 }
 
-function fmtOdds(o) { return !o ? '—' : o > 0 ? '+' + o : '' + o; }
+function fmtOdds(o) { return !o ? '-' : o > 0 ? '+' + o : '' + o; }
 function fmtDate(d) { return d.toLocaleDateString('en-US', {month:'short', day:'numeric'}); }
 function fmtDow(d)  { return d.toLocaleDateString('en-US', {weekday:'long'}); }
 function sameDay(a, b) {
@@ -646,7 +646,7 @@ function calcStats(bets) {
     avgOddsAmerican = decimalToAmerican(avgDecimal);
   }
 
-  // Daily record — a day is a W if net units > 0, L if < 0, push if exactly 0
+  // Daily record - a day is a W if net units > 0, L if < 0, push if exactly 0
   var dm = buildDayMap(bets);
   var dWins = 0, dLosses = 0, dPushes = 0;
   dm.dayOrder.forEach(function(key) {
@@ -657,7 +657,7 @@ function calcStats(bets) {
   });
   var dWinPct = (dWins + dLosses) > 0 ? dWins / (dWins + dLosses) : 0;
 
-  // Daily streak — walk days in reverse
+  // Daily streak - walk days in reverse
   var dStreak = 0, dStreakType = '';
   for (var i = dm.dayOrder.length - 1; i >= 0; i--) {
     var pl = dm.dayMap[dm.dayOrder[i]].pl;
@@ -697,20 +697,20 @@ function renderStatsBar(s) {
     el.className = 'sv' + (cls ? ' ' + cls : '');
   }
 
-  // Daily record — headline
+  // Daily record - headline
   var dRec = s.dWins + '-' + s.dLosses + (s.dPushes > 0 ? '-' + s.dPushes : '');
   set('s-drec', dRec, s.dWins > s.dLosses ? 'pos' : s.dLosses > s.dWins ? 'neg' : '');
   var bRecEl = document.getElementById('s-brec');
   bRecEl.textContent = s.wins + '-' + s.losses + ' bets';
 
   // Daily win %
-  var dWpStr = s.dWinPct > 0 ? (s.dWinPct * 100).toFixed(1) + '%' : '—';
+  var dWpStr = s.dWinPct > 0 ? (s.dWinPct * 100).toFixed(1) + '%' : '-';
   set('s-dwp', dWpStr, s.dWinPct >= 0.55 ? 'pos' : (s.dWinPct < 0.5 && s.dWins + s.dLosses > 0 ? 'neg' : ''));
   var bWpEl = document.getElementById('s-bwp');
   bWpEl.textContent = s.winPct > 0 ? (s.winPct * 100).toFixed(1) + '% bets' : '';
 
   // Daily streak
-  var strTxt = s.dStreak > 0 ? (s.dStreakType === 'w' ? 'W' : 'L') + s.dStreak : '—';
+  var strTxt = s.dStreak > 0 ? (s.dStreakType === 'w' ? 'W' : 'L') + s.dStreak : '-';
   set('s-str', strTxt, s.dStreakType === 'w' ? 'pos' : s.dStreakType === 'l' ? 'neg' : '');
 
   // Units P/L
@@ -721,7 +721,7 @@ function renderStatsBar(s) {
 
   // ROI + Avg Odds
   set('s-roi', (s.roi >= 0 ? '+' : '') + s.roi.toFixed(1) + '%', s.roi >= 0 ? 'pos' : 'neg');
-  set('s-odd', s.avgOddsAmerican !== null ? fmtOdds(s.avgOddsAmerican) : '—');
+  set('s-odd', s.avgOddsAmerican !== null ? fmtOdds(s.avgOddsAmerican) : '-');
 }
 
 // ═════════════════════════════════════════════════════
@@ -736,7 +736,7 @@ function renderNarrative(bets) {
   var roiStr = (stats.roi >= 0 ? '+' : '') + stats.roi.toFixed(1) + '%';
   var dWpStr = (stats.dWinPct * 100).toFixed(1) + '%';
 
-  // Season sentence — lead with daily record
+  // Season sentence - lead with daily record
   var seasonText = 'Through <strong>' + stats.totalDays + ' days</strong>, the Fantastic Four is <strong>' +
     stats.dWins + '-' + stats.dLosses + '</strong> (' + dWpStr + ' profitable days) with <strong>' +
     plStr + '</strong> net units and <strong>' + roiStr + ' ROI</strong>. ';
@@ -777,7 +777,7 @@ function renderNarrative(bets) {
     seasonText += ' <strong>' + bestType + '</strong> bets have been the sharpest angle at ' + (bestROI >= 0 ? '+' : '') + bestROI.toFixed(1) + '% ROI.';
   }
 
-  // Recent 7 days — use daily record for this window too
+  // Recent 7 days - use daily record for this window too
   var cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - 7);
 
@@ -825,7 +825,7 @@ function renderNarrative(bets) {
 function renderDashboardCharts(bets) {
   var settled = bets.filter(function(b) { return !b.pending && b.result; });
 
-  // Group by day — one data point per calendar day
+  // Group by day - one data point per calendar day
   var dayMap   = {};
   var dayOrder = [];
   settled.forEach(function(b) {
@@ -963,7 +963,7 @@ function renderWeeklyTrend(settled) {
   if (!settled.length) return;
   var weeks = {};
   settled.forEach(function(b) {
-    // Use date fields directly — no reconstruction
+    // Use date fields directly - no reconstruction
     var day = b.date.getDay();
     var offsetToMon = day === 0 ? 6 : day - 1;
     var mon = new Date(b.date.getFullYear(), b.date.getMonth(), b.date.getDate() - offsetToMon);
@@ -1073,7 +1073,7 @@ function renderDayOfWeek(settled) {
   var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   var dow  = days.map(function(d) { return { label:d, w:0, l:0, pl:0, units:0 }; });
   settled.forEach(function(b) {
-    // Use b.date.getDay() directly — no reconstruction
+    // Use b.date.getDay() directly - no reconstruction
     var d = b.date.getDay();
     dow[d][b.result]++; dow[d].pl += b.gainLoss || 0; dow[d].units += b.units;
   });
@@ -1148,7 +1148,7 @@ function renderTeamTracker(bets) {
   grid.innerHTML = sorted.map(function(entry) {
     var name = entry[0], s = entry[1];
     var settled = s.w + s.l;
-    var plStr   = settled > 0 ? (s.pl >= 0 ? '+' : '') + s.pl.toFixed(2) + 'u' : '—';
+    var plStr   = settled > 0 ? (s.pl >= 0 ? '+' : '') + s.pl.toFixed(2) + 'u' : '-';
     var plCls   = s.pl > 0 ? 'pos' : s.pl < 0 ? 'neg' : '';
     var cardCls = settled > 0 ? (s.pl > 0 ? 'profit' : s.pl < 0 ? 'loss' : '') : '';
     var winPct  = settled > 0 ? Math.round(s.w / settled * 100) : null;
@@ -1263,7 +1263,7 @@ function openTeamModal(teamName) {
     bets.slice().reverse().map(function(b) {
       var res   = b.pending ? 'Pending' : b.result.toUpperCase();
       var resCls = b.pending ? 'pnd' : b.result;
-      var pl    = b.gainLoss != null ? (b.gainLoss >= 0 ? '+' : '') + b.gainLoss.toFixed(3) : '—';
+      var pl    = b.gainLoss != null ? (b.gainLoss >= 0 ? '+' : '') + b.gainLoss.toFixed(3) : '-';
       var plCls = b.gainLoss != null ? (b.gainLoss > 0 ? 'pos' : b.gainLoss < 0 ? 'neg' : '') : '';
       return '<tr class="' + (b.pending ? 'pnd' : '') + '">' +
         '<td class="t-id">' + b.id + '</td>' +
@@ -1310,7 +1310,7 @@ function renderTable() {
   tb.innerHTML = filtered.slice().reverse().map(function(b) {
     var resLabel = b.pending ? 'Pending' : b.result.toUpperCase();
     var resCls   = b.pending ? 'pnd' : b.result;
-    var pl       = b.gainLoss != null ? (b.gainLoss >= 0 ? '+' : '') + b.gainLoss.toFixed(3) : '—';
+    var pl       = b.gainLoss != null ? (b.gainLoss >= 0 ? '+' : '') + b.gainLoss.toFixed(3) : '-';
     var plCls    = b.gainLoss != null ? (b.gainLoss > 0 ? 'pos' : b.gainLoss < 0 ? 'neg' : '') : '';
     return '<tr class="' + (b.pending ? 'pnd' : '') + '">' +
       '<td class="t-id">' + b.id + '</td>' +
