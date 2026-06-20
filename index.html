@@ -1133,7 +1133,7 @@ function logoUrl(teamName) {
 //  TEAMS PAGE
 // ═════════════════════════════════════════════════════
 function renderTeamTracker(bets) {
-  var sided = bets.filter(function(b) { return b.teamBet && (b.market === 'Side' || b.market === 'Spread'); });
+  var sided = bets.filter(function(b) { return b.teamBet && (b.market === 'Side' || b.market === 'Spread' || (b.market === 'Total' && b.teamBet)); });
   var teams = {};
   sided.forEach(function(b) {
     var t = b.teamBet;
@@ -1216,7 +1216,7 @@ function renderMLBCards(elId, teams, isHot) {
 //  TEAM DETAIL MODAL
 // ═════════════════════════════════════════════════════
 function openTeamModal(teamName) {
-  var bets    = allBets.filter(function(b) { return b.teamBet === teamName && (b.market === 'Side' || b.market === 'Spread'); });
+  var bets    = allBets.filter(function(b) { return b.teamBet === teamName && (b.market === 'Side' || b.market === 'Spread' || (b.market === 'Total' && b.teamBet)); });
   var settled = bets.filter(function(b) { return !b.pending && b.result; });
   var wins    = settled.filter(function(b) { return b.result === 'w'; }).length;
   var losses  = settled.filter(function(b) { return b.result === 'l'; }).length;
