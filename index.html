@@ -581,7 +581,7 @@ function getBetType(b) {
   var isF5  = pf5.indexOf('first') >= 0 || pf5 === 'f5' || pf5.indexOf('innings') >= 0;
   var isProp = b.playerF5 && !isF5;
   if (b.market === 'NRFI')   return 'NRFI';
-  if (b.market === 'Total')  return isF5 ? 'F5 Total'    : 'Game Total';
+  if (b.market === 'Total')  return isF5 ? 'F5 Total' : (b.teamBet ? 'Team Total' : 'Game Total');
   if (b.market === 'Spread') return isF5 ? 'F5 Run Line' : 'Run Line';
   if (b.market === 'Side')   return isProp ? 'Player Prop' : isF5 ? 'F5 ML' : 'Moneyline';
   return b.market || 'Other';
@@ -592,7 +592,7 @@ function getBetDesc(b) {
   var isF5 = pf5.indexOf('first') >= 0 || pf5.indexOf('innings') >= 0 || pf5 === 'f5';
   var f5   = isF5 ? ' (F5)' : '';
   if (b.market === 'NRFI')   return 'NRFI ' + b.ouDir + ' ' + b.line + ' - ' + b.home + '/' + b.away;
-  if (b.market === 'Total')  return b.ouDir + ' ' + b.line + f5 + ' - ' + b.home + '/' + b.away;
+  if (b.market === 'Total')  return b.teamBet ? b.teamBet + ' ' + b.ouDir + ' ' + b.line + f5 : b.ouDir + ' ' + b.line + f5 + ' - ' + b.home + '/' + b.away;
   if (b.market === 'Side')   return b.teamBet + ' ML' + f5;
   if (b.market === 'Spread') return b.teamBet + ' ' + b.line + f5;
   return b.home + ' vs. ' + b.away;
